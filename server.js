@@ -1,11 +1,13 @@
 import express from 'express';
-import routes from './src/routes/productRoutes.js';
+import productsRoutes from './src/routes/productRoutes.js';
 import path from 'path';
+import materialsRoutes from './src/routes/materialsRoutes.js';
 
 const app = express();
 
 // Middleware para servir arquivos estáticos, como CSS e JS, se necessário
-app.use(express.static(path.resolve('public')));
+app.use(express.json()); // Middleware para JSON
+app.use(express.urlencoded({ extended: true }));
 
 // Rotas para as páginas HTML
 app.get('/cadMaterial', (req, res) => {
@@ -25,7 +27,8 @@ app.get('/listaProdutos', (req, res) => {
 });
 
 // Rotas de API
-app.use('/api', routes); // Prefixo `/api` para as rotas da API
+app.use(productsRoutes);
+app.use(materialsRoutes);
 
 // Porta do servidor
 const PORT = 3001;
