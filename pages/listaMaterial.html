@@ -87,7 +87,7 @@
             <td class="border px-4 py-2">${material.matnome || '-'}</td>
             <td class="border px-4 py-2">${material.matdescricao || '-'}</td>
             <td class="border px-4 py-2">${material.matcor || '-'}</td>
-            <td class="border px-4 py-2">R$ ${material.matpreco?.toFixed(2) || '-'}</td>
+            <td class="border px-4 py-2">R$ ${material.matpreco?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '-'}</td>
             <td class="border px-4 py-2">${material.matqtdestoque || '-'}</td>
             <td class="border px-4 py-2">${material.matfornecedor || '-'}</td>
             <td class="border px-4 py-2 flex space-x-2 justify-center">
@@ -148,7 +148,9 @@
                         <input type="text" id="matnome" class="w-full mb-4 border p-2" placeholder="Nome" value="${material.matnome || ''}" />
                         <input type="text" id="matdescricao" class="w-full mb-4 border p-2" placeholder="Descrição" value="${material.matdescricao || ''}" />
                         <input type="text" id="matcor" class="w-full mb-4 border p-2" placeholder="Cor" value="${material.matcor || ''}" />
-                        <input type="number" id="matpreco" class="w-full mb-4 border p-2" placeholder="Preço" value="${material.matpreco || ''}" />
+                        <input id="preco" type="text" name="matpreco" placeholder="Preço" value="${material.matpreco || ''}"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            required oninput="this.value = this.value.replace(',', '.') ">
                         <input type="number" id="matqtdestoque" class="w-full mb-4 border p-2" placeholder="Quantidade" value="${material.matqtdestoque || ''}" />
                         <input type="text" id="matfornecedor" class="w-full mb-4 border p-2" placeholder="Fornecedor" value="${material.matfornecedor || ''}" />
                         <div class="flex justify-between">

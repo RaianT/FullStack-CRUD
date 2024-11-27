@@ -66,7 +66,7 @@
                         <label for="preco" class="block text-sm font-medium text-gray-700">Preço *</label>
                         <input id="preco" type="text" name="matpreco" placeholder="Digite o preço"
                             class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            required>
+                            required oninput="this.value = this.value.replace(',', '.')">
                     </div>
                     <div>
                         <label for="quantidade" class="block text-sm font-medium text-gray-700">Quantidade *</label>
@@ -103,7 +103,7 @@
             </form>
         </div>
     </div>
-    
+
 </body>
 
 </html>
