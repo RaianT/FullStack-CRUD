@@ -36,3 +36,15 @@ export const createProducts = async (req, res) => {
   }
 }
 
+export const deleteProduto = async (req, res) => {
+  try {
+    const id = req.params.id
+    await Product.delete({ where:{
+      procod:Number(id)
+    }})
+    res.status(200).json({ message: 'Produto excluída com sucesso.' });
+  } catch(e) {
+    res.status(500).json({ error: e });
+  }
+}
+  

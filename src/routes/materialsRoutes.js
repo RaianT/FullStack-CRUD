@@ -1,13 +1,12 @@
 import { Router } from 'express'
-import { getMaterials, createMaterials, getNameMaterials, deleteMaterial } from '../controllers/materialsController.js'
+import { getMaterials, createMaterials, deleteMaterial, editMaterial } from '../controllers/materialsController.js'
 
 const route = Router()
 
-route.get('/name-materials', getNameMaterials)
+route.put('/materials/:id', editMaterial)
 route.get('/materials', getMaterials)
 route.patch('/materials')
 route.delete('/materials/:id', deleteMaterial)
-route.put('/materials')
 route.post('/materials', createMaterials)
 
 export default route

@@ -75,6 +75,7 @@
         }
 
         function renderMaterials(materials) {
+            console.log('Materials to render:', materials);
             const tableBody = document.getElementById('materialTable');
             tableBody.innerHTML = ''; // Limpa a tabela antes de renderizar os novos dados
 
@@ -90,7 +91,8 @@
             <td class="border px-4 py-2">${material.matqtdestoque || '-'}</td>
             <td class="border px-4 py-2">${material.matfornecedor || '-'}</td>
             <td class="border px-4 py-2 flex space-x-2 justify-center">
-                <button class="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">Editar</button>
+                <button class="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600"
+                        onclick='editMaterial(${JSON.stringify(material)})'">Editar</button>
                 <button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600" 
                         onclick="deleteMaterial('${material.matcod}')">Deletar</button>
             </td>
@@ -101,6 +103,7 @@
         }
 
         async function deleteMaterial(materialId) {
+            console.log(materialId)
             try {
                 const response = await fetch(`/materials/${materialId}`, {
                     method: 'DELETE',
@@ -118,6 +121,99 @@
             }
         }
 
+        // EDITAR MATS
+
+        async function fetchMaterials() {
+            try {
+                const response = await fetch('/materials');
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar matérias-primas.');
+                }
+                const materials = await response.json();
+                renderMaterials(materials); // Atualiza a tabela
+            } catch (error) {
+                console.error('Erro ao buscar matérias-primas:', error);
+            }
+        }
+
+
+        async function editMaterial(material) {
+            console.log(material)
+            // Adicionar o modal ao corpo do HTML
+            const modalHtml = `
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+                    <h2 class="text-xl font-semibold mb-4">Editar Matéria-Prima</h2>
+                    <form id="editForm">
+                        <input type="text" id="matnome" class="w-full mb-4 border p-2" placeholder="Nome" value="${material.matnome || ''}" />
+                        <input type="text" id="matdescricao" class="w-full mb-4 border p-2" placeholder="Descrição" value="${material.matdescricao || ''}" />
+                        <input type="text" id="matcor" class="w-full mb-4 border p-2" placeholder="Cor" value="${material.matcor || ''}" />
+                        <input type="number" id="matpreco" class="w-full mb-4 border p-2" placeholder="Preço" value="${material.matpreco || ''}" />
+                        <input type="number" id="matqtdestoque" class="w-full mb-4 border p-2" placeholder="Quantidade" value="${material.matqtdestoque || ''}" />
+                        <input type="text" id="matfornecedor" class="w-full mb-4 border p-2" placeholder="Fornecedor" value="${material.matfornecedor || ''}" />
+                        <div class="flex justify-between">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Cancelar</button>
+                            <button type="submit" onclick="handleEdit(event)" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Salvar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            `;
+
+            async function handleEdit(event) {
+                event.preventDefault();
+                const materialId = material.matcod;
+
+                const formData = {
+                    matnome: document.getElementById('matnome').value,
+                    matdescricao: document.getElementById('matdescricao').value,
+                    matcor: document.getElementById('matcor').value,
+                    matpreco: parseFloat(document.getElementById('matpreco').value),
+                    matqtdestoque: parseInt(document.getElementById('matqtdestoque').value),
+                    matfornecedor: document.getElementById('matfornecedor').value,
+                };
+
+                console.log('URL:', `/materials/${materialId}`);
+                console.log('Dados enviados:', formData);
+
+                try {
+                    const response = await fetch(`/materials/${materialId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const responseData = await response.json();
+                    console.log('Resposta da API:', responseData);
+
+                    if (!response.ok) {
+                        throw new Error(responseData.error || 'Erro ao atualizar a matéria-prima.');
+                    }
+
+                    alert('Matéria-prima atualizada com sucesso!');
+                    closeModal();
+                    fetchMaterials(); // Atualiza a lista
+                } catch (error) {
+                    console.error('Erro ao salvar alterações:', error);
+                    alert(`Erro ao salvar alterações: ${error.message}`);
+                }
+            }
+
+
+
+
+
+
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) modal.remove();
+            fetchMaterials(); // Atualiza a lista de materiais
+        }
 
 
         // Chama a função para buscar e renderizar as matérias-primas ao carregar a página

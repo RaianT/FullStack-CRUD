@@ -7,39 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// model categoria {
-//   catcod       Int       @id @default(autoincrement())
-//   catdescricao String?   @db.VarChar(20)
-//   produto      produto[]
-// }
-
-// model cliente {
-//   clicod         Int       @id @default(autoincrement())
-//   clinome        String    @db.VarChar(80)
-//   clicelular     String    @db.VarChar(15)
-//   cliemail       String?   @db.VarChar(30)
-//   clidatanasc    DateTime? @db.Date
-//   clirua         String?   @db.VarChar(30)
-//   clinumero      Int?
-//   clibairro      String?   @db.VarChar(20)
-//   clicep         String?   @db.VarChar(9)
-//   clicomplemento String?   @db.VarChar(30)
-//   pedido         pedido[]
-// }
-
-// model fornecedor {
-//   forcod         Int        @id @default(autoincrement())
-//   fornome        String     @db.VarChar(80)
-//   forcelular     String     @db.VarChar(15)
-//   foremail       String?    @db.VarChar(30)
-//   forrua         String?    @db.VarChar(30)
-//   fornumero      Int?
-//   forbairro      String?    @db.VarChar(20)
-//   forcep         String?    @db.VarChar(9)
-//   forcomplemento String?    @db.VarChar(30)
-//   producao       producao[]
-// }
-
 model materiaprima {
   matcod        Int        @id @default(autoincrement())
   matnome       String     @db.VarChar(30)
@@ -49,50 +16,7 @@ model materiaprima {
   matpreco      Float
   matqtdestoque Int
   matcor           String?    @db.VarChar(20)
-  //producao      producao[]
 }
-
-// model pagamento {
-//   pagcod       Int      @id @default(autoincrement())
-//   pagdescricao String?  @db.VarChar(20)
-//   pedido       pedido[]
-// }
-
-// model pedido {
-//   pedcod        Int        @id @default(autoincrement())
-//   peddtpedido   DateTime?  @db.Date
-//   peddtentrega  DateTime?  @db.Date
-//   pedqtdproduto Int
-//   pedcliente    Int?
-//   pedvendedor   Int?
-//   pedproduto    Int?
-//   pedpagamento  Int?
-//   cliente       cliente?   @relation(fields: [pedcliente], references: [clicod], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_1")
-//   vendedor      vendedor?  @relation(fields: [pedvendedor], references: [vencod], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_2")
-//   produto       produto?   @relation(fields: [pedproduto], references: [procod], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_3")
-//   pagamento     pagamento? @relation(fields: [pedpagamento], references: [pagcod], onDelete: NoAction, onUpdate: NoAction, map: "pedido_ibfk_4")
-
-//   @@index([pedcliente], map: "pedcliente")
-//   @@index([pedpagamento], map: "pedpagamento")
-//   @@index([pedproduto], map: "pedproduto")
-//   @@index([pedvendedor], map: "pedvendedor")
-// }
-
-// model producao {
-//   prdcod           Int           @id @default(autoincrement())
-//   prddtcompra      DateTime?     @db.Date
-//   prddiasconfeccao Int?
-//   prdfornecedor    Int?
-//   prdmateriaprima  Int?
-//   prdproduto       Int?
-//   //fornecedor       fornecedor?   @relation(fields: [prdfornecedor], references: [forcod], onDelete: NoAction, onUpdate: NoAction, map: "producao_ibfk_1")
-//   materiaprima     materiaprima? @relation(fields: [prdmateriaprima], references: [matcod], onDelete: NoAction, onUpdate: NoAction, map: "producao_ibfk_2")
-//   produto          produto?      @relation(fields: [prdproduto], references: [procod], onDelete: NoAction, onUpdate: NoAction, map: "producao_ibfk_3")
-
-//   @@index([prdfornecedor], map: "prdfornecedor")
-//   @@index([prdmateriaprima], map: "prdmateriaprima")
-//   @@index([prdproduto], map: "prdproduto")
-// }
 
 model produto {
   procod        Int        @id @default(autoincrement())
@@ -102,20 +26,5 @@ model produto {
   proqtdestoque Int
   procategoria  String?    @db.VarChar(255)
   procor        String?    @db.VarChar(20)
-  //pedido        pedido[]
-  //producao      producao[]
-  //categoria     categoria? @relation(fields: [procategoria], references: [catcod], onDelete: NoAction, onUpdate: NoAction, map: "produto_ibfk_1")
-
   @@index([procategoria], map: "procategoria")
 }
-
-
-// model vendedor {
-//   vencod     Int      @id @default(autoincrement())
-//   vennome    String   @db.VarChar(80)
-//   vencelular String   @db.VarChar(15)
-//   venemail   String   @db.VarChar(30)
-//   venlogin   String   @db.VarChar(15)
-//   vensenha   String   @db.VarChar(8)
-//   //pedido     pedido[]
-// }
