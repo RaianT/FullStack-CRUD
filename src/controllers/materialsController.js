@@ -66,10 +66,14 @@ export const deleteMaterial = async (req, res) => {
 
 export const editMaterial = async (req, res) => {
   try {
-    const id = parseInt(req.params.id); // ID da matéria-prima
+    const id = parseInt(req.params.id); 
+    if (!id) {
+      return res.status(400).json({ error: 'ID inválido ou ausente.' });
+  }
+
     const { matnome, matdescricao, matcor, matpreco, matqtdestoque, matfornecedor } = req.body;
 
-    console.log('Dados recebidos para atualização:', { id, ...req.body }); // Log para depuração
+    console.log('Dados recebidos para atualização:', { id, ...req.body }); 
 
     const updatedMaterial = await Materials.update({
       where: { matcod: id },
@@ -77,13 +81,13 @@ export const editMaterial = async (req, res) => {
         matnome,
         matdescricao,
         matcor,
-        matpreco: parseFloat(matpreco), // Converte para float
-        matqtdestoque: parseInt(matqtdestoque), // Converte para inteiro
+        matpreco: parseFloat(matpreco), 
+        matqtdestoque: parseInt(matqtdestoque), 
         matfornecedor,
       },
     });
 
-    console.log('Material atualizado:', updatedMaterial); // Confirme o retorno do Prisma
+    console.log('Material atualizado:', updatedMaterial); 
 
     res.status(200).json({ message: 'Matéria-prima alterada com sucesso.', material: updatedMaterial });
   } catch (e) {

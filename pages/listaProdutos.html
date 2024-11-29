@@ -36,10 +36,10 @@
         <!-- Tabela -->
         <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-4xl">
             <h2 class="text-xl font-semibold text-gray-700 mb-4 flex justify-center">Lista de Produtos</h2>
-            <div class="flex justify-around">
+            <!-- <div class="flex justify-around">
                 <button class="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">Voltar</button>
                 <button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600">Cadastrar</button>
-            </div>
+            </div> -->
             <br>
             <table class="w-full table-auto border-collapse">
                 <thead>
@@ -61,45 +61,32 @@
 
     </div>
     <script>
-        async function fetchProducts() {
-            try {
-                const response = await fetch('/products'); // Substitua pelo endpoint correto da sua API
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar produtos.');
-                }
-                const products = await response.json();
-                renderProducts(products);
-            } catch (error) {
-                console.error('Erro ao buscar produtos:', error);
-            }
-        }
-    
         function renderProducts(products) {
             const tableBody = document.getElementById('productTable');
             tableBody.innerHTML = ''; // Limpa a tabela antes de renderizar os novos dados
-    
+
             products.forEach(product => {
                 const row = document.createElement('tr');
                 row.className = 'text-gray-600';
-    
+
                 row.innerHTML = `
-                    <td class="border px-4 py-2">${product.pronome}</td>
+                    <td class="border px-4 py-2">${product.pronome || '-'}</td>
                     <td class="border px-4 py-2">${product.prodescricao || '-'}</td>
                     <td class="border px-4 py-2">${product.procor || '-'}</td>
-                    <td class="border px-4 py-2">${product.proqtdestoque}</td>
-                    <td class="border px-4 py-2">R$ ${product.propreco.toFixed(2)}</td>
+                    <td class="border px-4 py-2">${product.proqtdestoque || '-'}</td>
+                    <td class="border px-4 py-2">R$ ${product.propreco?.toLocaleString('pt-BR', { minimumFractionDigits: 2 }) || '-'}</td>
                     <td class="border px-4 py-2">${product.procategoria || '-'}</td>
                     <td class="border px-4 py-2 flex space-x-2 justify-center">
-                        <button class="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600">Editar</button>
+                        <button class="px-3 py-1 bg-green-500 text-white rounded-md hover:bg-green-600" onclick='editProduto(${JSON.stringify(product)})'">Editar</button>
                         <button class="px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600" 
                                 onclick="deleteProduct('${product.procod}')">Deletar</button>
                     </td>
                 `;
-    
+
                 tableBody.appendChild(row);
             });
         }
-    
+
         async function deleteProduct(productId) {
             try {
                 const response = await fetch(`/products/${productId}`, {
@@ -108,21 +95,121 @@
                         'Content-Type': 'application/json',
                     },
                 });
-    
+
                 if (!response.ok) {
                     throw new Error('Erro ao excluir o produto.');
                 }
-                fetchProducts(); 
+                fetchProducts();
             } catch (error) {
                 console.log('Erro ao excluir o produto:', error);
                 console.log(productId);
             }
         }
-    
+
+        // EDITAR MATS
+
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/products');
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar os Produtos.');
+                }
+                const product = await response.json();
+                renderProducts(product); // Atualiza a tabela
+            } catch (error) {
+                console.error('Erro ao buscar os Produtos:', error);
+            }
+        }
+        async function handleEdit() {
+            const updatedProduto = {
+                pronome: document.getElementById('editProNome').value,
+                prodescricao: document.getElementById('editProDescricao').value,
+                procor: document.getElementById('editProCor').value,
+                propreco: parseFloat(document.getElementById('editProPreco').value),
+                proqtdestoque: parseInt(document.getElementById('editProQtdEstoque').value),
+                procategoria: document.getElementById('editProCategoria').value,
+            };
+
+            try {
+                const response = await fetch(`/products/${currentProdutoId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(updatedProduto),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Erro ao atualizar os Produtos.');
+                }
+
+                alert('Produtos atualizados com sucesso!');
+                closeModal();
+                fetchProducts(); // Atualiza a tabela após salvar
+            } catch (error) {
+                console.error('Erro ao salvar alterações:', error);
+                alert(`Erro ao salvar alterações: ${error.message}`);
+            }
+        }
+
+
+        async function editProduto(product) {
+            currentProdutoId = product.procod; // Armazena o ID globalmente para usar em `handleEdit`
+
+            // Construção do HTML do modal com o fornecedor sendo selecionado corretamente
+            const modalHtml = ` 
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-lg w-96">
+            <h2 class="text-xl font-semibold mb-4">Editar Produtos</h2>
+            <form id="editForm">
+                <th class="text-left font-semibold border-b pb-2">Nome:</th>
+                <input type="text" id="editProNome" class="w-full mb-4 border p-2" placeholder="Nome" value="${product.pronome || '-'}" />
+                <th class="text-left font-semibold border-b pb-2">Descrição:</th>
+                <input type="text" id="editProDescricao" class="w-full mb-4 border p-2" placeholder="Descrição" value="${product.prodescricao || '-'}" />
+                <th class="text-left font-semibold border-b pb-2">Cor:</th>
+                <input type="text" id="editProCor" class="w-full mb-4 border p-2" placeholder="Cor" value="${product.procor || '-'}" />
+                <th class="text-left font-semibold border-b pb-2">Preço:</th>
+                <input type="text" id="editProPreco" class="w-full mb-4 border p-2" placeholder="Preço" value="${product.propreco || '-'}" />
+                <th class="text-left font-semibold border-b pb-2">Quantidade:</th>
+                <input type="number" id="editProQtdEstoque" class="w-full mb-4 border p-2" placeholder="Quantidade" value="${product.proqtdestoque || '-'}" />
+                
+                <th class="text-left font-semibold">Categoria:</th>
+                <!-- Select com os categoria -->
+                <select id="editProCategoria" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="" disabled>Selecione uma Categoria</option>
+                    <option value="Amigurumi" ${product.procategoria === 'Amigurumi' ? 'selected' : ''}>Amigurumi</option>
+
+                    <option value="Jogo de Banheiro" ${product.procategoria === 'Jogo de Banheiro' ? 'selected' : ''}>Jogo de Banheiro</option>
+
+                    <option value="Jogo de Passadeira" ${product.procategoria === 'Jogo de Passadeira' ? 'selected' : ''}>Jogo de Passadeira</option>
+
+                    <option value="Sousplat" ${product.procategoria === 'Sousplat' ? 'selected' : ''}>Sousplat</option>
+                    
+                </select>
+                <!-- Espaçamento entre o categoria e o botão salvar -->
+                <div class="mb-4"></div>
+                <div class="flex justify-between">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600">Cancelar</button>
+                    <button type="button" onclick="handleEdit()" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+
+        function closeModal() {
+            const modal = document.querySelector('.fixed.inset-0');
+            if (modal) modal.remove();
+        }
+
+
         // Chama a função para buscar e renderizar os produtos ao carregar a página
         window.onload = fetchProducts;
     </script>
-    
+
 
 </body>
 

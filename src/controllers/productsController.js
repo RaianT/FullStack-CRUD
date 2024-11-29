@@ -47,4 +47,31 @@ export const deleteProduto = async (req, res) => {
     res.status(500).json({ error: e });
   }
 }
-  
+ 
+export const editProduto = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id); 
+    const { pronome, prodescricao, procor, propreco, proqtdestoque, procategoria } = req.body;
+
+    console.log('Dados recebidos para atualização:', { id, ...req.body }); // Log para depuração
+
+    const updatedProduto = await Product.update({
+      where: { procod: id },
+      data: {
+        pronome,
+        prodescricao,
+        procor,
+        propreco: parseFloat(propreco), // Converte para float
+        proqtdestoque: parseInt(proqtdestoque), // Converte para inteiro
+        procategoria,
+      },
+    });
+
+    console.log('Produto atualizado:', updatedProduto); // Confirme o retorno do Prisma
+
+    res.status(200).json({ message: 'Produto atualizado com sucesso.', product: updatedProduto });
+  } catch (e) {
+    console.error('Erro ao editar o produto:', e);
+    res.status(500).json({ error: e.message });
+  }
+};
